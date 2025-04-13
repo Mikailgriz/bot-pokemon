@@ -1,17 +1,33 @@
 import aiohttp  # A library for asynchronous HTTP requests
 import random
+import asyncio
 
 class Pokemon:
     pokemons = {}
+
     # Object initialisation (constructor)
-    def __init__(self, pokemon_trainer):
+    def __init__(self, pokemon_trainer,):
         self.pokemon_trainer = pokemon_trainer
+        self.hp = random.randint(50, 500)
+        self.power = random.randint(100, 250)
         self.pokemon_number = random.randint(1, 1000)
         self.name = None
         if pokemon_trainer not in Pokemon.pokemons:
             Pokemon.pokemons[pokemon_trainer] = self
         else:
             self = Pokemon.pokemons[pokemon_trainer]
+    
+    async def attack(self, enemy):
+        if isinstance(enemy, Wizard):  # Periksa apakah musuh adalah tipe data Penyihir (instance dari kelas Penyihir)
+            kesempatan = random.randint(1,5)
+            if kesempatan == 1:
+                return "Pokemon penyihir menggunakan perisai dalam pertarungan"
+        if enemy.hp > self.power:
+            enemy.hp -= self.power
+            return f"Pertarungan @{self.pokemon_trainer} dengan @{enemy.pokemon_trainer}"
+        else:
+            enemy.hp = 0
+            return f"@{self.pokemon_trainer} menang melawan @{enemy.pokemon_trainer}!"
 
     async def get_name(self):
         # An asynchronous method to get the name of a pokémon via PokeAPI
@@ -28,7 +44,7 @@ class Pokemon:
         # A method that returns information about the pokémon
         if not self.name:
             self.name = await self.get_name()  # Retrieving a name if it has not yet been uploaded
-        return f"The name of your Pokémon: {self.name}"  # Returning the string with the Pokémon's name
+        return f"The name of your Pokémon: {self.name} The HP your pokemon get :{self.hp} The Power your pokemon get :{self.power}"  # Returning the string with the Pokémon's name
 
     async def show_img(self):
         # An asynchronous method to retrieve the URL of a pokémon image via PokeAPI
@@ -64,6 +80,43 @@ class Pokemon:
                 else:
                     return "Moves Not Found."  # Return the default name if the request fails
 
+class Wizard(Pokemon):
+    async def attack(self, enemy):
+        return await super().attack(enemy)
+    async def info(self):
+        # A method that returns information about the pokémon
+        if not self.name:
+            self.name = await self.get_name()  # Retrieving a name if it has not yet been uploaded
+        return f"The class of your Pokémon is Wizard: {self.name} "  # Returning the string with the Pokémon's name
+
+class Fighter(Pokemon):
+    async def attack(self, enemy):
+        kekuatan_super = random.randint(5,15)
+        self.power += kekuatan_super
+        hasil = await super().attack(enemy)
+        self.power-= kekuatan_super
+        return hasil + f"\nPetarung menggunakan serangan super dengan kekuatan:{kekuatan_super} "
+    async def info(self):
+        # A method that returns information about the pokémon
+        if not self.name:
+            self.name = await self.get_name()  # Retrieving a name if it has not yet been uploaded
+        return f"The class of your Pokémon is Fighter: {self.name} "  # Returning the string with the Pokémon's name
 
 
-                
+async def main():
+    wizard = Wizard("username1")
+    fighter = Fighter("username2")
+
+    print(await wizard.info())
+    print()
+    print(await fighter.info())
+    print()
+    print(await fighter.attack(wizard))   
+
+if __name__ == '__main__':
+    asyncio.run(main())
+
+
+
+
+
