@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 from config import token
-from logic import Pokemon
+from logic import Pokemon, Wizard, Fighter
 import random
 
 # Setting up intents for the bot
@@ -71,6 +71,25 @@ async def move(ctx):
     if author in Pokemon.pokemons.keys():
         pokemon = Pokemon(author)
         await ctx.send(await pokemon.show_moves())
+
+@bot.command()
+async def info(ctx):
+    author = ctx.author.name
+    if author in Pokemon.pokemons.keys():
+        pokemon = Pokemon.pokemons[ctx.author.name]
+        await ctx.send(await pokemon.info())
+
+@bot.command()
+async def feed(ctx):
+    author = ctx.author.name
+    if author in Pokemon.pokemons:
+       pokemon = Pokemon.pokemons[ctx.author.name]
+       await ctx.send(await pokemon.feed())
+            
+        
+
+
+
 
                        
 
